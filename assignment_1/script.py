@@ -2,7 +2,8 @@
     Component of MSCI-641
     Created on 29/5/19
     Assignment 1
-
+    
+	https://github.com/dishant-mittal/MSCI_641/tree/master/assignment_1
     """
 
 import sys
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     ################################################### TOKENIZE
     pat = re.compile(r"([^\w\s])")
 
+    #adding spaces before and after all punctuation characters
     def add_spaces(item):
         global pat
         return pat.sub(" \\1 ", item)
@@ -52,11 +54,14 @@ if __name__ == "__main__":
         temp_list = [re.sub(pattern,'', x.lower()) for x in item]
         return [i for i in temp_list if i]
 
+    stop_words = stopwords.words('english')
+
     def remove_stop_words(item):
-        return [i for i in temp_list if (i not in stopwords)]
+        global stop_words
+        return [i for i in item if (i not in stop_words)]
 
     df['tokenized'] = df['tokenized'].apply(remove_special_chars)
-    df['tokenized_no_stopwords'] = df['tokenized'].apply(remove_special_chars)
+    df['tokenized_no_stopwords'] = df['tokenized'].apply(remove_stop_words)
 
     # df.head()
 
