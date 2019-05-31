@@ -1,4 +1,5 @@
 """ Author: Dishant Mittal
+	Student Id : 20710581
     Component of MSCI-641
     Created on 29/5/19
     Assignment 1
@@ -7,7 +8,6 @@
     """
 
 import sys
-import pandas as pd
 import random
 import os
 import re
@@ -26,9 +26,8 @@ if __name__ == "__main__":
     # sample_tokenized_list = [["Hello", "World", "."], ["Good", "bye"]]
 
     ################################################### READ DATA
-    cols = ["reviews"]
-    df = pd.read_csv(input_path, names=cols, sep="\n",header=None)
-    # df.head()
+    with open(input_path) as f:
+    	reviews = f.readlines()
 
 
     ################################################### TOKENIZE
@@ -39,9 +38,8 @@ if __name__ == "__main__":
         global pat
         return pat.sub(" \\1 ", item)
 
-    df['reviews']=df['reviews'].apply(add_spaces)
-    df['tokenized'] = df["reviews"].str.split(" ", expand = False)
-    # df.head()
+    reviews = [add_spaces(item) for item in reviews]
+    tokenized = [item.split() for item in reviews]
 
 
     ########################## CONVERTING TOKENS INTO LOWERCASE
@@ -60,49 +58,27 @@ if __name__ == "__main__":
         global stop_words
         return [i for i in item if (i not in stop_words)]
 
-    df['tokenized'] = df['tokenized'].apply(remove_special_chars)
-    df['tokenized_no_stopwords'] = df['tokenized'].apply(remove_stop_words)
-
-    # df.head()
+    tokenized = [remove_special_chars(item) for item in tokenized]
+    tokenized_no_stopwords = [remove_stop_words(item) for item in tokenized]
 
     ################################################## SHUFFLING (UNCOMMENT FOLLOWING IF NEED TO SHUFFLE ALSO)
-    #shuffle using pandas inbuilt method
-    # df = df.sample(frac=1).reset_index(drop=True)
-
-    #OR
-
-    # shuffle_dataset (my own shuffle code from scratch) uncomment the following method to test
-    # def shuffle_in_place(array):
-    #     array_len = len(array)
-    #     assert array_len > 2, 'This list is very short to shuffle'
-    #     for index in range(array_len):
-    #         swap = random.randrange(array_len - 1)
-    #         swap += swap >= index
-    #         array.iloc[index], array.iloc[swap] = array.iloc[swap], array.iloc[index]
-            
-    # # arr=[1,2,3,4,5,6]
-    # shuffle_in_place(df)
-    # df.head()
+    # random.shuffle(tokenized)
+	# random.shuffle(tokenized_no_stopwords)
 
 
     ################################################## SPLITTING INTO TRAIN, VALIDATION AND TEST 
 
-    train_end=int(0.8 * len(df))
+    train_end=int(0.8 * len(tokenized))
 
-    validation_end=int(train_end+ 0.1 * len(df))
+    validation_end=int(train_end+ 0.1 * len(tokenized))
 
-    train_set = df[0:train_end]
-    validation_set = df[train_end:validation_end+1]
-    test_set = df[validation_end+1:len(df)]
+    train_list = tokenized[0:train_end]
+    val_list = tokenized[train_end:validation_end]
+    test_list = tokenized[validation_end:len(tokenized)]
 
-    #save_lists
-    train_list= list(train_set['tokenized'])
-    val_list= list(validation_set['tokenized'])
-    test_list= list(test_set['tokenized'])
-
-    train_list_no_stopword = list(train_set['tokenized_no_stopwords'])
-    val_list_no_stopword = list(validation_set['tokenized_no_stopwords'])
-    test_list_no_stopword = list(test_set['tokenized_no_stopwords'])    
+    train_list_no_stopword = tokenized_no_stopwords[0:train_end]
+    val_list_no_stopword = tokenized_no_stopwords[train_end:validation_end]
+    test_list_no_stopword = tokenized_no_stopwords[validation_end:len(tokenized)]	
 
     ################################################## SAVE THE FILES
 
