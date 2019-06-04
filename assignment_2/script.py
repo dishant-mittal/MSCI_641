@@ -6,25 +6,11 @@
     
 	https://github.com/dishant-mittal/MSCI_641/tree/master/assignment_2
 
-	this script accepts one parameter for input path of 12 scripts.
-	I assume that the input path contains 2 different directories namely
-	pos and neg. Each of these directories contain 6 different files as follows: 
+	this script accepts 6 parameters for input path in the following order 
+	training_pos, training_neg, validation_pos, validation_neg, test_pos, test_neg	
 
-	pos:
-		test.csv
-		test_no_stopword.csv
-		train.csv
-		train_no_stopword.csv
-		val.csv
-		val_no_stopword.csv
-
-	neg:
-		test.csv
-		test_no_stopword.csv
-		train.csv
-		train_no_stopword.csv
-		val.csv
-		val_no_stopword.csv		
+	For example: In my personal machine I use the following path:
+	python script.py ../assignment_1/pos/train.csv ../assignment_1/neg/train.csv ../assignment_1/pos/val.csv ../assignment_1/neg/val.csv ../assignment_1/pos/test.csv ../assignment_1/neg/test.csv
 
 	Note: a row in any of the csv file is of the format: 
 	['you'	 'can'	'	 't'	 'go'	 'wrong'	 'with'	 'the'	 'greatshield'	 'ultra'	 'smooth'	 '.']
@@ -66,7 +52,7 @@ def find_test_accuracy(tup, grams):
     val, val_target = shuffle(tup[1], tup[4])
     test, test_target = shuffle(tup[0], tup[3])
     # train, train_target=train[0:1], train_target[0:1]
-    # print(train[0])
+    # print(train)
     if grams == 'unigrams':
         vector = CountVectorizer(stop_words=[])# only unigrams
     elif grams == 'bigrams':
@@ -112,47 +98,24 @@ def find_test_accuracy(tup, grams):
     
 
 if __name__ == "__main__":
-	input_path = sys.argv[1]
+	training_pos = read_data(sys.argv[1])
+	training_neg = read_data(sys.argv[2])
+	validation_pos = read_data(sys.argv[3])
+	validation_neg = read_data(sys.argv[4])
+	test_pos = read_data(sys.argv[5])
+	test_neg = read_data(sys.argv[6])
 	# print(input_path)
-	############### PATHS
-	############### STOPWORDS INCLUDED
-	test_pos=read_data(input_path+"/pos/test.csv")
-	val_pos=read_data(input_path+"/pos/val.csv")
-	train_pos=read_data(input_path+"/pos/train.csv")
+	############### PATH
+	path_tuple = (test_pos, validation_pos, training_pos,test_neg,validation_neg,training_neg)
+	# print(path_tuple)
 
-	test_neg=read_data(input_path+"/neg/test.csv")
-	val_neg=read_data(input_path+"/neg/val.csv")
-	train_neg=read_data(input_path+"/neg/train.csv")
-	stop_words_included_tup = (test_pos,val_pos,train_pos,test_neg,val_neg,train_neg) 
+	print("TEXT_FEATURES= UNIGRAMS")
+	find_test_accuracy(path_tuple,'unigrams')
 
-	################# STOPWORDS REMOVED
-	test_pos_no_stopwords=read_data(input_path+"/pos/test_no_stopword.csv")
-	val_pos_no_stopwords=read_data(input_path+"/pos/val_no_stopword.csv")
-	train_pos_no_stopwords=read_data(input_path+"/pos/train_no_stopword.csv")
+	print("\nTEXT_FEATURES= BIGRAMS")
+	find_test_accuracy(path_tuple,'bigrams')
 
-	test_neg_no_stopwords=read_data(input_path+"/neg/test_no_stopword.csv")
-	val_neg_no_stopwords=read_data(input_path+"/neg/val_no_stopword.csv")
-	train_neg_no_stopwords=read_data(input_path+"/neg/train_no_stopword.csv")
-	stop_words_removed_tup = (test_pos_no_stopwords,val_pos_no_stopwords,train_pos_no_stopwords,test_neg_no_stopwords,val_neg_no_stopwords,train_neg_no_stopwords)
-
-	print("STOPWORDS_REMOVED = YES, TEXT_FEATURES= UNIGRAMS")
-	find_test_accuracy(stop_words_removed_tup,'unigrams')
-
-	print("\nSTOPWORDS_REMOVED = YES, TEXT_FEATURES= BIGRAMS")
-	find_test_accuracy(stop_words_removed_tup,'bigrams')
-
-	print("\nSTOPWORDS_REMOVED = YES, TEXT_FEATURES= UNIGRAMS + BIGRAMS")
-	find_test_accuracy(stop_words_removed_tup,'both')
-
-	print("\nSTOPWORDS_REMOVED = NO, TEXT_FEATURES= UNIGRAMS")
-	find_test_accuracy(stop_words_included_tup,'unigrams')
-
-	print("\nSTOPWORDS_REMOVED = NO, TEXT_FEATURES= BIGRAMS")
-	find_test_accuracy(stop_words_included_tup,'bigrams')
-
-	print("\nSTOPWORDS_REMOVED = NO, TEXT_FEATURES= UNIGRAMS + BIGRAMS")
-	find_test_accuracy(stop_words_included_tup,'both')
-
-
+	print("\nTEXT_FEATURES= UNIGRAMS + BIGRAMS")
+	find_test_accuracy(path_tuple,'both')
 
 
